@@ -3,10 +3,11 @@ package Tetris;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Tetris {
+public class Tetris extends Thread {
     private int row = 20;
     private int col = 10;
     ArrayList<Form> forms = new ArrayList<>();
+    //Coord [][] grid = new Coord[20][10];
 
     //public run(){
         //simula gravità
@@ -14,7 +15,25 @@ public class Tetris {
     //}
 
     public void gravity(){
+        boolean freeCoords = false;
+        Coord c;
         for(Form f : this.forms){
+            int xMax = f.getMaxX();
+            ArrayList<Integer> arrY = f.getArrY();
+            if(xMax < this.row-1){
+                for(Integer i : arrY){
+                    c = new Coord(xMax+1, i);
+                    if(f.compare(c)){
+                        freeCoords = false;
+                        break;
+                    }else{
+                        freeCoords = true;
+                    }
+                }
+                if(freeCoords){
+                    f.drop();
+                }
+            }
             //gravity chiama un metodo di controllo dentro Form
             //Form controlla se la forma corrente non si trova sulla riga massima
             //controlla anche se lo spazio è libero
@@ -73,6 +92,7 @@ public class Tetris {
                 for(Form f : this.forms){
                     if(f.compare(new Coord(i,j))){
                         result += "■";
+                        //result += f.getIcon()//dare colori differenti alle forme e ritornarle
                     }else{
                         result += " ";
                     }
@@ -83,4 +103,24 @@ public class Tetris {
         }
         return result;
     }
+
+    /*public String toString2(){
+        String result = "";
+        for(int i = 0; i < this.grid.length; i++){
+            result += "[";
+            for(int j = 0; j < this.grid[i].length; j++){
+                result += "[";
+                for(Form f : this.forms){
+                    if(f.compare(new Coord(i,j))){
+                        result += "■";
+                    }else{
+                        result += " ";
+                    }
+                }
+                result += "]";
+            }
+            result += "]\n";
+        }
+        return result;
+    }*/
 }
