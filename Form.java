@@ -1,6 +1,5 @@
 package Tetris;
 
-import java.util.Arrays;
 
 public class Form {
     private char name;
@@ -14,22 +13,14 @@ public class Form {
         this.coords[3] = c4;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if(o instanceof Coord){
-            Coord c = (Coord) o;
-            for(int i = 0; i < this.coords.length; i++){
-                if(this.coords[i].getX() == c.getX() && this.coords[i].getY() == c.getY()){
-                    return true;
-                }
+
+
+    public boolean compare(Coord c){
+        for(int i = 0; i < this.coords.length; i++){
+            if (this.coords[i].getY() == c.getY() && this.coords[i].getX() == c.getX()){
+                return true;
             }
-            return false;
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(coords);
     }
 }

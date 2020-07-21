@@ -8,6 +8,23 @@ public class Tetris {
     private int col = 10;
     ArrayList<Form> forms = new ArrayList<>();
 
+    //public run(){
+        //simula gravità
+        //a muovi sinistra d muovi destra w ruota
+    //}
+
+    public void gravity(){
+        for(Form f : this.forms){
+            //gravity chiama un metodo di controllo dentro Form
+            //Form controlla se la forma corrente non si trova sulla riga massima
+            //controlla anche se lo spazio è libero
+            //Form ha un metodo che controlla quale é l'elemento più in basso
+            //metodo per la rotazione
+            //metodo per lo spostamento destra o sinistra
+            //metodo per l'esplosione della riga completa
+        }
+    }
+
     public Tetris(){
         this.formGenerator();
     }
@@ -53,10 +70,12 @@ public class Tetris {
             result += "[";
             for(int j = 0; j < this.col; j++){
                 result += "[";
-                if(this.forms.contains(new Coord(i, j))){
-                    result += "▄";
-                }else{
-                    result += " ";
+                for(Form f : this.forms){
+                    if(f.compare(new Coord(i,j))){
+                        result += "■";
+                    }else{
+                        result += " ";
+                    }
                 }
                 result += "]";
             }
