@@ -1,21 +1,27 @@
 package Tetris;
 
-
-
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Form {
     private char name;
+    Coord test;
     Coord[] coords = new Coord[4];
+    String color;
     int xMax;
     ArrayList<Integer> arrY = new ArrayList<>();
 
-    public Form(char name, Coord c1, Coord c2, Coord c3, Coord c4){
+    public Form(Coord c){
+        this.test = c;
+    }
+
+    public Form(char name, Coord c1, Coord c2, Coord c3, Coord c4, String color){
         this.name = name;
         this.coords[0] = c1;
         this.coords[1] = c2;
         this.coords[2] = c3;
         this.coords[3] = c4;
+        this.color = color;
     }
 
     public boolean compare(Coord c){
@@ -46,5 +52,9 @@ public class Form {
         for(int i = 0; i < this.coords.length; i++){
             this.coords[i].setX(this.coords[i].getX()+1);
         }
+    }
+
+    public String getColor(){
+        return this.color;
     }
 }

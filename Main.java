@@ -5,6 +5,12 @@ public class Main {
         Tetris t = new Tetris();
         System.out.println(t);
         t.gravity();
+        //System.out.println(t);
+        t.gravity();
+        //System.out.println(t);
+        t.formGenerator();
+        System.out.println(t);
+        t.gravity();
         System.out.println(t);
     }
 }
