@@ -1,5 +1,7 @@
 package Tetris;
 
+import java.util.Objects;
+
 public class Coord {
     private int x;
     private int y;
@@ -23,5 +25,19 @@ public class Coord {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Coord c = (Coord) o;
+        if(this.getX() == c.getX() && this.getY() == c.getY()){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }

@@ -1,7 +1,6 @@
 package Tetris;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Form {
     private char name;
@@ -9,7 +8,7 @@ public class Form {
     Coord[] coords = new Coord[4];
     String color;
     int xMax;
-    ArrayList<Integer> arrY = new ArrayList<>();
+
 
     public Form(Coord c){
         this.test = c;
@@ -36,17 +35,31 @@ public class Form {
     public int getMaxX(){
         xMax = this.coords[0].getX();
         for(int i = 1; i < this.coords.length; i++){
-            if(this.coords[i].getX() >= xMax){
+            if(this.coords[i].getX() > xMax){
                 xMax = this.coords[i].getX();
-                this.arrY.add(this.coords[i].getY());
             }
         }
         return xMax;
     }
 
     public ArrayList<Integer> getArrY(){
-        return this.arrY;
+        ArrayList<Integer> arrY = new ArrayList<>();
+        for (int i = 0; i < this.coords.length; i++){
+            if(this.coords[i].getX() == this.xMax){
+                arrY.add(this.coords[i].getY());
+            }
+        }
+        return arrY;
     }
+
+    public Coord[] getCoords(){
+        return this.coords;
+    }
+
+    public void setCoords(Coord[] coords){
+        this.coords = coords;
+    }
+
 
     public void drop(){
         for(int i = 0; i < this.coords.length; i++){
