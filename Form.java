@@ -3,11 +3,13 @@ package Tetris;
 import java.util.ArrayList;
 
 public class Form {
+    enum Rotation{NORMAL, DEGREE90, DEGREE180, DEGREE270}
     private char name;
     Coord test;
     Coord[] coords = new Coord[4];
     String color;
     int xMax;
+    private Rotation rotation = Rotation.NORMAL;
 
 
     public Form(Coord c){
@@ -60,6 +62,18 @@ public class Form {
         this.coords = coords;
     }
 
+
+    public Rotation getRotation(){
+        return this.rotation;
+    }
+
+    public void setRotation(Rotation rotation){
+        this.rotation = rotation;
+    }
+
+    public char getName(){
+        return this.name;
+    }
 
     public void drop(){
         for(int i = 0; i < this.coords.length; i++){

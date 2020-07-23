@@ -29,6 +29,7 @@ public class Tetris extends Thread {
                     System.out.println("Fai schifo");
                     break;
                 }
+                this.checkCoords();
                 System.out.println(this.toString());
             }
         }
@@ -144,6 +145,18 @@ public class Tetris extends Thread {
         this.forms.add(this.currentForm);
     }
 
+    /*public void rotate(){
+        Coord [] coords = this.currentForm.getCoords();
+        switch (this.currentForm.getName()){
+            case 'I':{
+                if(this.currentForm.getRotation() == Form.Rotation.NORMAL){
+                    this.currentForm.setRotation(Form.Rotation.DEGREE90);
+
+                }
+            }
+        }
+    }*/
+
     public boolean checkLose(){
         Coord[] coords = this.currentForm.getCoords();
         if(this.coordsNotFree.contains(coords[0])
@@ -159,8 +172,10 @@ public class Tetris extends Thread {
     public String toString(){
         String result = "";
         boolean found = false;
+        result += "╔══════════════════════════════╗\n";
+        result += "╠══════════════════════════════╣\n";
         for(int i = 0; i < this.row; i++){
-            result += "[";
+            result += "║";
             for(int j = 0; j < this.col; j++){
                 result += "[";
                 for(Form f : this.forms){
@@ -177,8 +192,9 @@ public class Tetris extends Thread {
                 }
                 result += "]";
             }
-            result += "]\n";
+            result += "║\n";
         }
+        result += "╚══════════════════════════════╝\n";
         return result;
     }
 }
