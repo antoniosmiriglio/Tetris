@@ -12,15 +12,16 @@ public class Tetris extends Thread {
     LinkedList<Form> forms = new LinkedList<>();
     ArrayList<Coord> coordsNotFree = new ArrayList<>();
     Form currentForm;
-    Coord c=this.currentForm.getCoordMin();
+    Coord c;
     Coord[] arrayCoords=new Coord[4];
+    Coord[] rotatedCoord;
     boolean free=false;
 
     public void run(){
         while(!lose){
             try {
                 while(nextRowFree()){
-                    sleep(400);
+                    sleep(2000);
                     this.gravity();
                     System.out.println(this.toString());
                 }
@@ -44,6 +45,7 @@ public class Tetris extends Thread {
         this.formGenerator();
         System.out.println(this.toString());
         this.currentForm = this.forms.getLast();
+        this.c = this.currentForm.getCoordMin();
         this.checkCoords();
     }
 
@@ -130,13 +132,15 @@ public class Tetris extends Thread {
 
     public void move(Move m){
         Coord [] coords = this.currentForm.getCoords();
-        if(m == Move.LEFT){
+        int maxY = this.currentForm.getMaxY();
+        int minY = this.currentForm.getMinY();
+        if(m == Move.LEFT && minY-1 >= 0){
             for(int i = 0; i < coords.length; i++){
                 if(coords[i].getY()-1 >= 0){
                     coords[i].setY(coords[i].getY()-1);
                 }
             }
-        }else if(m == Move.RIGHT){
+        }else if(m == Move.RIGHT && maxY+1 <= this.col-1){
             for(int i = 0; i < coords.length; i++){
                 if(coords[i].getY()+1 <= this.col-1){
                     coords[i].setY(coords[i].getY()+1);
@@ -145,20 +149,27 @@ public class Tetris extends Thread {
         }
         this.forms.remove(this.currentForm);
         this.currentForm.setCoords(coords);
+        this.c = this.currentForm.getCoordMin();
         this.forms.add(this.currentForm);
     }
 
     public void rotate(){
         Coord [] coords = this.currentForm.getCoords();
+        arrayCoords[0]=c;
         removeCurrentForm();
         switch (this.currentForm.getRotation()){
             case NORMAL:{
                 singleRotate90();
+                break;
             }
             case DEGREE90:{
                 singleRotate180();
+                break;
             }
-
+            case DEGREE270:{
+                singleRotate270();
+                break;
+            }
 
         }
     }
@@ -169,166 +180,40 @@ public class Tetris extends Thread {
         }
     }
 
-    public void singleRotate180(){
-        arrayCoords[0]=c;
-        switch (this.currentForm.getName()){
-            case 'I':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                } else{
-                    free=false;
-                    break;
-                }
-                if(!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[2]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                } else{
-                    free=false;
-                    break;
-                }
-                if(!this.coordsNotFree.contains(new Coord(c.getX()+3, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+3, c.getY());
-                    free=true;
-                } else{
-                    free=false;
-                }
-                break;
-            }
-            case 'T':{
 
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                break;
-            }
-            case 'S':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()+1))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                break;
-            }
-
-            case 'Z':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                break;
-            }
-            case 'J':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()+1))){
-                    arrayCoords[1]=new Coord(c.getX(), c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                break;
-            }
-            case 'L':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()-1))){
-                    arrayCoords[0]=new Coord(c.getX(), c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
-                    arrayCoords[2]=new Coord(c.getX()+2, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                break;
-            }
+    private void setSingleRotatedCoord(int index,int x,int y){
+        if (!this.coordsNotFree.contains(new Coord(c.getX()+x, c.getY()+y))){
+            arrayCoords[index]=new Coord(c.getX()+x, c.getY()+y);
+            free=true;
+        } else{
+            free=false;
         }
+    }
+
+    private void update(){
         if (free){
             this.forms.remove(this.currentForm);
             this.currentForm.setCoords(arrayCoords);
-            this.currentForm.setRotation(Form.Rotation.DEGREE90);
+            switch (this.currentForm.getRotation()){
+                case NORMAL:{
+                    this.currentForm.setRotation(Form.Rotation.DEGREE90);
+                    break;
+                }
+                case DEGREE90:{
+                    this.currentForm.setRotation(Form.Rotation.DEGREE180);
+                    break;
+                }
+                case DEGREE180:{
+                    this.currentForm.setRotation(Form.Rotation.DEGREE270);
+                    break;
+                }
+                case DEGREE270:{
+                    this.currentForm.setRotation(Form.Rotation.NORMAL);
+                    break;
+                }
+
+            }
+            this.c = this.currentForm.getCoordMin();
             this.forms.add(this.currentForm);
             this.coordsNotFree.clear();
             this.checkCoords();
@@ -336,171 +221,170 @@ public class Tetris extends Thread {
     }
 
     public void singleRotate90(){
-
-        arrayCoords[0]=c;
         switch (this.currentForm.getName()){
             case 'I':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                } else{
-                    free=false;
-                    break;
-                }
-                if(!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[2]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                } else{
-                    free=false;
-                    break;
-                }
-                if(!this.coordsNotFree.contains(new Coord(c.getX()+3, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+3, c.getY());
-                    free=true;
-                } else{
-                    free=false;
-                }
+                rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(2, 0),new Coord(1, 0)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'T':{
+                rotatedCoord= new Coord[]{new Coord(1, 1),new Coord(1, 0),new Coord(2, 0)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'S':{
+                rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, 1),new Coord(2, 1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'Z':{
+                rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, -1),new Coord(2, -1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'J':{
+                rotatedCoord= new Coord[]{new Coord(0, 2),new Coord(0, 1),new Coord(1, 1),new Coord(2, 1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'L':{
+                rotatedCoord= new Coord[]{new Coord(0, -1),new Coord(1, -1),new Coord(2, -1),new Coord(2, 0)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+        }
+        update();
+    }
+
+    public void singleRotate180(){
+        switch (this.currentForm.getName()){
+            case 'I':{
+                rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(0, 2),new Coord(0, 3)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'T':{
+                rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(0, 1),new Coord(0, -1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'S':{
+                rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 0),new Coord(1, -1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'Z':{
+                rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 1),new Coord(1, 2)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'J':{
+                rotatedCoord= new Coord[]{new Coord(2, 1),new Coord(1, -1),new Coord(1, 0),new Coord(1, 1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'L':{
+                rotatedCoord= new Coord[]{new Coord(1, -1),new Coord(1, 0),new Coord(1, 1),new Coord(2, -1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+        }
+        update();
+    }
+
+    //Completare rotate 270
+    //Completare rotateBackNormal
+    //Controllare se le coordinate escono fuori dalla griglia
+    //metodo esplosione riga
+    public void singleRotate270(){
+
+        switch (this.currentForm.getName()){
+            case 'I':{
+                setSingleRotatedCoord(1, 0, 1);
+                if (!free)break;
+                setSingleRotatedCoord(2, 0, 2);
+                if (!free)break;
+                setSingleRotatedCoord(3, 0, 3);
+                if (!free)break;
                 break;
             }
             case 'T':{
-
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
+                setSingleRotatedCoord(1, 1, 1);
+                if (!free)break;
+                setSingleRotatedCoord(2, 1, 0);
+                if (!free)break;
+                setSingleRotatedCoord(3, 2, 0);
+                if (!free)break;
                 break;
             }
             case 'S':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()+1))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
+                setSingleRotatedCoord(1, 1, 0);
+                if (!free)break;
+                setSingleRotatedCoord(2, 1, 1);
+                if (!free)break;
+                setSingleRotatedCoord(3, 2, 1);
+                if (!free)break;
                 break;
             }
-
             case 'Z':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
+                setSingleRotatedCoord(1, 1, 0);
+                if (!free)break;
+                setSingleRotatedCoord(2, 1, -1);
+                if (!free)break;
+                setSingleRotatedCoord(3, 2, -1);
+                if (!free)break;
                 break;
             }
             case 'J':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()+1))){
-                    arrayCoords[1]=new Coord(c.getX(), c.getY()+1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
-                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
+                setSingleRotatedCoord(0, 0, 2);
+                if (!free)break;
+                setSingleRotatedCoord(1, 0, 1);
+                if (!free)break;
+                setSingleRotatedCoord(2, 1, 1);
+                if (!free)break;
+                setSingleRotatedCoord(3, 2, 1);
+                if (!free)break;
                 break;
             }
             case 'L':{
-                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()-1))){
-                    arrayCoords[0]=new Coord(c.getX(), c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
-                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
-                    arrayCoords[2]=new Coord(c.getX()+2, c.getY()-1);
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
-                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
-                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
-                    free=true;
-                }else{
-                    free=false;
-                    break;
-                }
+                setSingleRotatedCoord(0, 0, -1);
+                if (!free)break;
+                setSingleRotatedCoord(1, 1, -1);
+                if (!free)break;
+                setSingleRotatedCoord(2, 2, -1);
+                if (!free)break;
+                setSingleRotatedCoord(3, 2, 0);
+                if (!free)break;
                 break;
             }
         }
-        if (free){
-            this.forms.remove(this.currentForm);
-            this.currentForm.setCoords(arrayCoords);
-            this.currentForm.setRotation(Form.Rotation.DEGREE90);
-            this.forms.add(this.currentForm);
-            this.coordsNotFree.clear();
-            this.checkCoords();
-        }
+        update();
     }
+
 
     public boolean checkLose(){
         Coord[] coords = this.currentForm.getCoords();

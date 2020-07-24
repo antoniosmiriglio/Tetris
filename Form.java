@@ -5,17 +5,11 @@ import java.util.ArrayList;
 public class Form {
     enum Rotation{NORMAL, DEGREE90, DEGREE180, DEGREE270}
     private char name;
-    Coord test;
     Coord[] coords = new Coord[4];
     String color;
     int xMax;
-    Coord coordMin;
     private Rotation rotation = Rotation.NORMAL;
 
-
-    public Form(Coord c){
-        this.test = c;
-    }
 
     public Form(char name, Coord c1, Coord c2, Coord c3, Coord c4, String color){
         this.name = name;
@@ -44,10 +38,31 @@ public class Form {
         }
         return xMax;
     }
-    public Coord getCoordMin() {
-        coordMin=new Coord(this.coords[0].getX(),this.coords[0].getY());
+
+    public int getMaxY(){
+        int yMax = this.coords[0].getY();
         for(int i = 1; i < this.coords.length; i++){
-            if(this.coords[i].getX() < coordMin.getX() &&
+            if(this.coords[i].getY() > yMax){
+                yMax = this.coords[i].getY();
+            }
+        }
+        return yMax;
+    }
+
+    public int getMinY(){
+        int yMin = this.coords[0].getY();
+        for(int i = 1; i < this.coords.length; i++){
+            if(this.coords[i].getY() < yMin){
+                yMin = this.coords[i].getY();
+            }
+        }
+        return yMin;
+    }
+
+    public Coord getCoordMin() {
+        Coord coordMin=new Coord(this.coords[0].getX(),this.coords[0].getY());
+        for(int i = 1; i < this.coords.length; i++){
+            if(this.coords[i].getX() <= coordMin.getX() &&
                     this.coords[i].getY() < coordMin.getY()){
                 coordMin = this.coords[i];
             }

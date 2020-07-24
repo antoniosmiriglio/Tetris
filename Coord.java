@@ -40,4 +40,8 @@ public class Coord {
     public int hashCode() {
         return Objects.hash(x, y);
     }
+
+    public String toString(){
+        return this.x + " - " + this.y;
+    }
 }
