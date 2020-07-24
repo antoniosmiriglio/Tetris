@@ -12,6 +12,9 @@ public class Tetris extends Thread {
     LinkedList<Form> forms = new LinkedList<>();
     ArrayList<Coord> coordsNotFree = new ArrayList<>();
     Form currentForm;
+    Coord c=this.currentForm.getCoordMin();
+    Coord[] arrayCoords=new Coord[4];
+    boolean free=false;
 
     public void run(){
         while(!lose){
@@ -35,6 +38,13 @@ public class Tetris extends Thread {
         }
         //simula gravità
         //a muovi sinistra d muovi destra w ruota
+    }
+
+    public Tetris(){
+        this.formGenerator();
+        System.out.println(this.toString());
+        this.currentForm = this.forms.getLast();
+        this.checkCoords();
     }
 
     public void gravity(){
@@ -81,13 +91,6 @@ public class Tetris extends Thread {
     }
     //metodo per la rotazione
     //metodo per l'esplosione della riga completa
-
-    public Tetris(){
-        this.formGenerator();
-        System.out.println(this.toString());
-        this.currentForm = this.forms.getLast();
-        this.checkCoords();
-    }
 
     public void formGenerator(){
         int numb = ThreadLocalRandom.current().nextInt(7);
@@ -145,17 +148,359 @@ public class Tetris extends Thread {
         this.forms.add(this.currentForm);
     }
 
-    /*public void rotate(){
+    public void rotate(){
         Coord [] coords = this.currentForm.getCoords();
+        removeCurrentForm();
+        switch (this.currentForm.getRotation()){
+            case NORMAL:{
+                singleRotate90();
+            }
+            case DEGREE90:{
+                singleRotate180();
+            }
+
+
+        }
+    }
+
+    public void removeCurrentForm(){
+        for (Coord c: this.currentForm.getCoords()){
+            this.coordsNotFree.remove(c);
+        }
+    }
+
+    public void singleRotate180(){
+        arrayCoords[0]=c;
         switch (this.currentForm.getName()){
             case 'I':{
-                if(this.currentForm.getRotation() == Form.Rotation.NORMAL){
-                    this.currentForm.setRotation(Form.Rotation.DEGREE90);
-
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                } else{
+                    free=false;
+                    break;
                 }
+                if(!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[2]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                } else{
+                    free=false;
+                    break;
+                }
+                if(!this.coordsNotFree.contains(new Coord(c.getX()+3, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+3, c.getY());
+                    free=true;
+                } else{
+                    free=false;
+                }
+                break;
+            }
+            case 'T':{
+
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+            case 'S':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()+1))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+
+            case 'Z':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+            case 'J':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()+1))){
+                    arrayCoords[1]=new Coord(c.getX(), c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+            case 'L':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()-1))){
+                    arrayCoords[0]=new Coord(c.getX(), c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
+                    arrayCoords[2]=new Coord(c.getX()+2, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
             }
         }
-    }*/
+        if (free){
+            this.forms.remove(this.currentForm);
+            this.currentForm.setCoords(arrayCoords);
+            this.currentForm.setRotation(Form.Rotation.DEGREE90);
+            this.forms.add(this.currentForm);
+            this.coordsNotFree.clear();
+            this.checkCoords();
+        }
+    }
+
+    public void singleRotate90(){
+
+        arrayCoords[0]=c;
+        switch (this.currentForm.getName()){
+            case 'I':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                } else{
+                    free=false;
+                    break;
+                }
+                if(!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[2]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                } else{
+                    free=false;
+                    break;
+                }
+                if(!this.coordsNotFree.contains(new Coord(c.getX()+3, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+3, c.getY());
+                    free=true;
+                } else{
+                    free=false;
+                }
+                break;
+            }
+            case 'T':{
+
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+            case 'S':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()+1))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()+1))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+
+            case 'Z':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+            case 'J':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()+1))){
+                    arrayCoords[1]=new Coord(c.getX(), c.getY()+1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()))){
+                    arrayCoords[2]=new Coord(c.getX()+1, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+            case 'L':{
+                if (!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()-1))){
+                    arrayCoords[0]=new Coord(c.getX(), c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY()-1))){
+                    arrayCoords[1]=new Coord(c.getX()+1, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()-1))){
+                    arrayCoords[2]=new Coord(c.getX()+2, c.getY()-1);
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                if (!this.coordsNotFree.contains(new Coord(c.getX()+2, c.getY()))){
+                    arrayCoords[3]=new Coord(c.getX()+2, c.getY());
+                    free=true;
+                }else{
+                    free=false;
+                    break;
+                }
+                break;
+            }
+        }
+        if (free){
+            this.forms.remove(this.currentForm);
+            this.currentForm.setCoords(arrayCoords);
+            this.currentForm.setRotation(Form.Rotation.DEGREE90);
+            this.forms.add(this.currentForm);
+            this.coordsNotFree.clear();
+            this.checkCoords();
+        }
+    }
 
     public boolean checkLose(){
         Coord[] coords = this.currentForm.getCoords();

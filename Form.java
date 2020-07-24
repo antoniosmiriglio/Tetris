@@ -9,6 +9,7 @@ public class Form {
     Coord[] coords = new Coord[4];
     String color;
     int xMax;
+    Coord coordMin;
     private Rotation rotation = Rotation.NORMAL;
 
 
@@ -42,6 +43,16 @@ public class Form {
             }
         }
         return xMax;
+    }
+    public Coord getCoordMin() {
+        coordMin=new Coord(this.coords[0].getX(),this.coords[0].getY());
+        for(int i = 1; i < this.coords.length; i++){
+            if(this.coords[i].getX() < coordMin.getX() &&
+                    this.coords[i].getY() < coordMin.getY()){
+                coordMin = this.coords[i];
+            }
+        }
+        return coordMin;
     }
 
     public ArrayList<Integer> getArrY(){
