@@ -1,5 +1,3 @@
-package Tetris;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,13 +7,13 @@ public class Tetris extends Thread {
     boolean lose = false;
     private int row = 10;
     private int col = 10;
-    LinkedList<Form> forms = new LinkedList<>();
-    ArrayList<Coord> coordsNotFree = new ArrayList<>();
-    Form currentForm;
-    Coord c;
-    Coord[] arrayCoords=new Coord[4];
-    Coord[] rotatedCoord;
-    boolean free=false;
+    private LinkedList<Form> forms = new LinkedList<>();
+    private ArrayList<Coord> coordsNotFree = new ArrayList<>();
+    private Form currentForm;
+    private Coord c;
+    private Coord[] arrayCoords=new Coord[4];
+    private Coord[] rotatedCoord;
+    private boolean free=false;
 
     public void run(){
         while(!lose){
@@ -54,6 +52,7 @@ public class Tetris extends Thread {
             this.coordsNotFree.clear();
             this.currentForm.drop();
             this.checkCoords();
+            this.c = this.currentForm.getCoordMin();
         }
     }
 
@@ -91,8 +90,6 @@ public class Tetris extends Thread {
             }
         }
     }
-    //metodo per la rotazione
-    //metodo per l'esplosione della riga completa
 
     public void formGenerator(){
         int numb = ThreadLocalRandom.current().nextInt(7);
@@ -166,8 +163,12 @@ public class Tetris extends Thread {
                 singleRotate180();
                 break;
             }
-            case DEGREE270:{
+            case DEGREE180:{
                 singleRotate270();
+                break;
+            }
+            case DEGREE270:{
+                singleRotateNormal();
                 break;
             }
 
@@ -180,9 +181,10 @@ public class Tetris extends Thread {
         }
     }
 
-
     private void setSingleRotatedCoord(int index,int x,int y){
-        if (!this.coordsNotFree.contains(new Coord(c.getX()+x, c.getY()+y))){
+        if (!this.coordsNotFree.contains(new Coord(c.getX()+x, c.getY()+y))){ //sembra esserci un errore nel girare la z dopo spostamento destra
+            //la prima volta non entra in questa condizione, le altre si, probabilmente trova la prima coordinata occupata
+            //dopo che sposti due volte a destra entra nella condizione solo una volta, e forma una L
             arrayCoords[index]=new Coord(c.getX()+x, c.getY()+y);
             free=true;
         } else{
@@ -213,21 +215,47 @@ public class Tetris extends Thread {
                 }
 
             }
-            this.c = this.currentForm.getCoordMin();
+            //if (currentForm.getName()!='T'){
+                this.c = this.currentForm.getCoordMin();
+            //}
             this.forms.add(this.currentForm);
             this.coordsNotFree.clear();
             this.checkCoords();
         }
     }
 
+    private void caseZ() {
+        rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, -1),new Coord(2, -1)};
+        for (int i=0;i<rotatedCoord.length;i++){
+            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            if (!free)break;
+        }
+        return;
+    }
+
+    private void caseS() {
+        rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, 1),new Coord(2, 1)};
+        for (int i=0;i<rotatedCoord.length;i++){
+            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            if (!free)break;
+        }
+        return;
+    }
+
+    private void caseI() {
+        rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(2, 0),new Coord(3, 0)};
+        for (int i=0;i<rotatedCoord.length;i++){
+            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            if (!free)break;
+        }
+        return;
+    }
+
     public void singleRotate90(){
         switch (this.currentForm.getName()){
             case 'I':{
-                rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(2, 0),new Coord(1, 0)};
-                for (int i=0;i<rotatedCoord.length;i++){
-                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
-                    if (!free)break;
-                }break;
+                caseI();
+                break;
             }
             case 'T':{
                 rotatedCoord= new Coord[]{new Coord(1, 1),new Coord(1, 0),new Coord(2, 0)};
@@ -237,18 +265,12 @@ public class Tetris extends Thread {
                 }break;
             }
             case 'S':{
-                rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, 1),new Coord(2, 1)};
-                for (int i=0;i<rotatedCoord.length;i++){
-                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
-                    if (!free)break;
-                }break;
+                caseS();
+                break;
             }
             case 'Z':{
-                rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, -1),new Coord(2, -1)};
-                for (int i=0;i<rotatedCoord.length;i++){
-                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
-                    if (!free)break;
-                }break;
+                caseZ();
+                break;
             }
             case 'J':{
                 rotatedCoord= new Coord[]{new Coord(0, 2),new Coord(0, 1),new Coord(1, 1),new Coord(2, 1)};
@@ -268,14 +290,38 @@ public class Tetris extends Thread {
         update();
     }
 
+    private void caseZ2() {
+        rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 1),new Coord(1, 2)};
+        for (int i=0;i<rotatedCoord.length;i++){
+            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            if (!free)break;
+        }
+        return;
+    }
+
+    private void caseS2() {
+        rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 0),new Coord(1, -1)};
+        for (int i=0;i<rotatedCoord.length;i++){
+            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            if (!free)break;
+        }
+        return;
+    }
+
+    private void caseI2() {
+        rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(0, 2),new Coord(0, 3)};
+        for (int i=0;i<rotatedCoord.length;i++){
+            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            if (!free)break;
+        }
+        return;
+    }
+
     public void singleRotate180(){
         switch (this.currentForm.getName()){
             case 'I':{
-                rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(0, 2),new Coord(0, 3)};
-                for (int i=0;i<rotatedCoord.length;i++){
-                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
-                    if (!free)break;
-                }break;
+                caseI2();
+                break;
             }
             case 'T':{
                 rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(0, 1),new Coord(0, -1)};
@@ -285,18 +331,12 @@ public class Tetris extends Thread {
                 }break;
             }
             case 'S':{
-                rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 0),new Coord(1, -1)};
-                for (int i=0;i<rotatedCoord.length;i++){
-                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
-                    if (!free)break;
-                }break;
+                caseS2();
+                break;
             }
             case 'Z':{
-                rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 1),new Coord(1, 2)};
-                for (int i=0;i<rotatedCoord.length;i++){
-                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
-                    if (!free)break;
-                }break;
+                caseZ2();
+                break;
             }
             case 'J':{
                 rotatedCoord= new Coord[]{new Coord(2, 1),new Coord(1, -1),new Coord(1, 0),new Coord(1, 1)};
@@ -316,82 +356,94 @@ public class Tetris extends Thread {
         update();
     }
 
-    //Completare rotate 270
-    //Completare rotateBackNormal
+    // La Z e la T sono buggate come gesu
     //Controllare se le coordinate escono fuori dalla griglia
     //metodo esplosione riga
-    public void singleRotate270(){
 
+    public void singleRotate270(){
         switch (this.currentForm.getName()){
             case 'I':{
-                setSingleRotatedCoord(1, 0, 1);
-                if (!free)break;
-                setSingleRotatedCoord(2, 0, 2);
-                if (!free)break;
-                setSingleRotatedCoord(3, 0, 3);
-                if (!free)break;
-                break;
-            }
-            case 'T':{
-                setSingleRotatedCoord(1, 1, 1);
-                if (!free)break;
-                setSingleRotatedCoord(2, 1, 0);
-                if (!free)break;
-                setSingleRotatedCoord(3, 2, 0);
-                if (!free)break;
+                caseI();
                 break;
             }
             case 'S':{
-                setSingleRotatedCoord(1, 1, 0);
-                if (!free)break;
-                setSingleRotatedCoord(2, 1, 1);
-                if (!free)break;
-                setSingleRotatedCoord(3, 2, 1);
-                if (!free)break;
+                caseS();
                 break;
             }
             case 'Z':{
-                setSingleRotatedCoord(1, 1, 0);
-                if (!free)break;
-                setSingleRotatedCoord(2, 1, -1);
-                if (!free)break;
-                setSingleRotatedCoord(3, 2, -1);
-                if (!free)break;
+                caseZ();
                 break;
+            }
+            case 'T':{
+                rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 0),new Coord(2, 1),new Coord(1, 1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
             }
             case 'J':{
-                setSingleRotatedCoord(0, 0, 2);
-                if (!free)break;
-                setSingleRotatedCoord(1, 0, 1);
-                if (!free)break;
-                setSingleRotatedCoord(2, 1, 1);
-                if (!free)break;
-                setSingleRotatedCoord(3, 2, 1);
-                if (!free)break;
-                break;
+                rotatedCoord= new Coord[]{new Coord(-1, 1),new Coord(0, 1),new Coord(1, 1),new Coord(1, 0)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
             }
             case 'L':{
-                setSingleRotatedCoord(0, 0, -1);
-                if (!free)break;
-                setSingleRotatedCoord(1, 1, -1);
-                if (!free)break;
-                setSingleRotatedCoord(2, 2, -1);
-                if (!free)break;
-                setSingleRotatedCoord(3, 2, 0);
-                if (!free)break;
-                break;
+                rotatedCoord= new Coord[]{new Coord(-1, 0),new Coord(-1, 1),new Coord(0, 1),new Coord(1, 1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
             }
         }
         update();
     }
 
+    public void singleRotateNormal(){
+        switch (this.currentForm.getName()){
+            case 'I':{
+                caseI2();
+                break;
+            }
+            case 'S':{
+                caseS2();
+                break;
+            }
+            case 'Z':{
+                caseZ2();
+                break;
+            }
+            case 'T':{
+                rotatedCoord= new Coord[]{new Coord(1, -1),new Coord(1, 0),new Coord(1, 1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'J':{
+                rotatedCoord= new Coord[]{new Coord(0, -1),new Coord(1, -1),new Coord(1, 0),new Coord(1, 1)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+            case 'L':{
+                rotatedCoord= new Coord[]{new Coord(0, 2),new Coord(1, 2),new Coord(1, 1),new Coord(1, 0)};
+                for (int i=0;i<rotatedCoord.length;i++){
+                    setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+                    if (!free)break;
+                }break;
+            }
+        }
+        update();
+    }
 
     public boolean checkLose(){
         Coord[] coords = this.currentForm.getCoords();
         if(this.coordsNotFree.contains(coords[0])
-        || this.coordsNotFree.contains(coords[1])
-        || this.coordsNotFree.contains(coords[2])
-        || this.coordsNotFree.contains(coords[3])){
+                || this.coordsNotFree.contains(coords[1])
+                || this.coordsNotFree.contains(coords[2])
+                || this.coordsNotFree.contains(coords[3])){
             this.lose = true;
             return true;
         }
