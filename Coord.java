@@ -1,3 +1,5 @@
+package Tetris;
+
 import java.util.Objects;
 
 public class Coord {

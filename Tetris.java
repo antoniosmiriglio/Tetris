@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Tetris extends Thread {
     enum Move {LEFT, RIGHT};
     boolean lose = false;
-    private int row = 10;
+    private int row = 20;
     private int col = 10;
     private LinkedList<Form> forms = new LinkedList<>();
     private ArrayList<Coord> coordsNotFree = new ArrayList<>();
@@ -16,40 +16,37 @@ public class Tetris extends Thread {
     private Coord[] arrayCoords=new Coord[4];
     private Coord[] rotatedCoord;
     private boolean free=false;
+    private int points = 0;
 
+    //Fixare la condizione del while
     public void run(){
-        while(!lose){
+        while(!this.lose){
             try {
-                while(nextRowFree()){
-                    sleep(2000);
-                    this.gravity();
-                    System.out.println(this.toString());
+                if(this.points > 500){
+                    sleep(500);
+                }else{
+                    sleep(700);
                 }
+                this.gravity();
+                System.out.println(this.toString());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                this.formGenerator();
-                if(this.checkLose()){
-                    System.out.println("Fai schifo");
+                if(this.lose){
+                    System.out.println("Lost");
                     break;
                 }
-                this.checkCoords();
-                System.out.println(this.toString());
             }
         }
-        //simula gravità
-        //a muovi sinistra d muovi destra w ruota
     }
 
     public Tetris(){
         this.formGenerator();
         System.out.println(this.toString());
-        this.currentForm = this.forms.getLast();
         this.c = this.currentForm.getCoordMin();
         this.checkCoords();
     }
 
-    //FUNZIONA
     public void gravity(){
         if(nextRowFree()){
             this.coordsNotFree.clear();
@@ -57,11 +54,12 @@ public class Tetris extends Thread {
             this.checkCoords();
             this.c = this.currentForm.getCoordMin();
         }else{
-           this.formGenerator();
+            this.explosion();
+            this.formGenerator();
         }
+
     }
 
-    //FUNZIONA
     public boolean nextRowFree(){
         ArrayList<Coord> coordsDiffY = this.currentForm.coordWithDifferentY();
         boolean free = false;
@@ -80,52 +78,62 @@ public class Tetris extends Thread {
         return free;
     }
 
-    //FUNZIONA
     public void checkCoords(){
-        for(int i = 0; i < this.row; i++){
-            for(int j = 0; j < this.col; j++){
-                for(Form f : this.forms){
-                    if(f.compare(new Coord(i,j)) && !this.coordsNotFree.contains(new Coord(i,j))){
-                        this.coordsNotFree.add(new Coord(i,j));
+        if(this.forms.size() > 1){
+            for(int i = 0; i < this.row; i++){
+                for(int j = 0; j < this.col; j++){
+                    for(Form f : this.forms){
+                        if(f.compare(new Coord(i,j)) && !this.coordsNotFree.contains(new Coord(i,j))){
+                            this.coordsNotFree.add(new Coord(i,j));
+                        }
                     }
                 }
             }
         }
     }
 
-    //FUNZIONA
+    //Funziona
     public void formGenerator(){
         int numb = ThreadLocalRandom.current().nextInt(7);
-        System.out.println(numb);
-        switch (numb){
-            case 0: {
-                this.forms.add(new Form('I', new Coord(0, 3), new Coord(0, 4), new Coord(0, 5), new Coord(0, 6), "\033[0;34m■\033[0m"));
-                break;
+        Coord[] defaultForm = new Coord[]{new Coord(0,3), new Coord(0,4), new Coord(0,5), new Coord(0,6),
+                new Coord(1,3), new Coord(1,4), new Coord(1,5), new Coord(1,6)};
+        if(!this.coordsNotFree.contains(defaultForm[0]) &&  !this.coordsNotFree.contains(defaultForm[1])
+                && !this.coordsNotFree.contains(defaultForm[2]) && !this.coordsNotFree.contains(defaultForm[3])
+                && !this.coordsNotFree.contains(defaultForm[4]) && !this.coordsNotFree.contains(defaultForm[5])
+                && !this.coordsNotFree.contains(defaultForm[6]) && !this.coordsNotFree.contains(defaultForm[7])){
+            switch (numb){
+                case 0: {
+                    this.forms.add(new Form('I', new Coord(0, 3), new Coord(0, 4), new Coord(0, 5), new Coord(0, 6), "\033[0;34m■\033[0m"));
+                    break;
+                }
+                case 1: {
+                    this.forms.add(new Form('J', new Coord(0, 3), new Coord(1, 3), new Coord(1, 4), new Coord(1, 5), "\033[0;31m■\033[0m"));
+                    break;
+                }
+                case 2:{
+                    this.forms.add(new Form('L', new Coord(0, 6), new Coord(1, 6), new Coord(1, 5), new Coord(1, 4), "\033[0;35m■\033[0m"));
+                    break;
+                }
+                case 3:{
+                    this.forms.add(new Form('O', new Coord(0, 4), new Coord(0, 5), new Coord(1, 4), new Coord(1, 5), "\033[0;36m■\033[0m"));
+                    break;
+                }
+                case 4: {
+                    this.forms.add(new Form('S', new Coord(0, 6), new Coord(0, 5), new Coord(1, 5), new Coord(1, 4), "\033[0;33m■\033[0m"));
+                    break;
+                }
+                case 5: {
+                    this.forms.add(new Form('T', new Coord(0, 4), new Coord(1, 3), new Coord(1, 4), new Coord(1, 5), "\033[0;32m■\033[0m"));
+                    break;
+                }
+                case 6: {
+                    this.forms.add(new Form('Z', new Coord(0, 3), new Coord(0, 4), new Coord(1, 4), new Coord(1, 5), "\033[0;30m■\033[0m"));
+                    break;
+                }
             }
-            case 1: {
-                this.forms.add(new Form('J', new Coord(0, 3), new Coord(1, 3), new Coord(1, 4), new Coord(1, 5), "\033[0;31m■\033[0m"));
-                break;
-            }
-            case 2:{
-                this.forms.add(new Form('L', new Coord(0, 6), new Coord(1, 6), new Coord(1, 5), new Coord(1, 4), "\033[0;35m■\033[0m"));
-                break;
-            }
-            case 3:{
-                this.forms.add(new Form('O', new Coord(0, 4), new Coord(0, 5), new Coord(1, 4), new Coord(1, 5), "\033[0;36m■\033[0m"));
-                break;
-            }
-            case 4: {
-                this.forms.add(new Form('S', new Coord(0, 6), new Coord(0, 5), new Coord(1, 5), new Coord(1, 4), "\033[0;33m■\033[0m"));
-                break;
-            }
-            case 5: {
-                this.forms.add(new Form('T', new Coord(0, 4), new Coord(1, 3), new Coord(1, 4), new Coord(1, 5), "\033[0;32m■\033[0m"));
-                break;
-            }
-            case 6: {
-                this.forms.add(new Form('Z', new Coord(0, 3), new Coord(0, 4), new Coord(1, 4), new Coord(1, 5), "\033[0;30m■\033[0m"));
-                break;
-            }
+
+        }else{
+            this.lose = true;
         }
         this.currentForm = this.forms.getLast();
     }
@@ -133,49 +141,77 @@ public class Tetris extends Thread {
     //FUNZIONA
     public void move(Move m){
         Coord [] coords = this.currentForm.getCoords();
+        this.removeCurrentForm();
         int maxY = this.currentForm.getMaxY();
         int minY = this.currentForm.getMinY();
-        if(m == Move.LEFT && minY-1 >= 0){
+
+        if(m == Move.LEFT && minY-1 >= 0 && this.canMoveToLeft()){
             for(int i = 0; i < coords.length; i++){
                 if(coords[i].getY()-1 >= 0){
                     coords[i].setY(coords[i].getY()-1);
                 }
             }
-        }else if(m == Move.RIGHT && maxY+1 <= this.col-1){
+        }else if(m == Move.RIGHT && maxY+1 <= this.col-1 && this.canMoveToRight()){
             for(int i = 0; i < coords.length; i++){
                 if(coords[i].getY()+1 <= this.col-1){
                     coords[i].setY(coords[i].getY()+1);
                 }
             }
         }
-        this.forms.remove(this.currentForm);
-        this.currentForm.setCoords(coords);
-        this.forms.add(this.currentForm);
         this.c = this.currentForm.getCoordMin();
 
     }
 
-    public void rotate(){
-        arrayCoords[0]=c;
-        removeCurrentForm();
-        switch (this.currentForm.getRotation()){
-            case NORMAL:{
-                singleRotate90();
-                break;
+    private boolean canMoveToLeft(){
+        ArrayList<Coord> coordMinY = this.currentForm.coordWithMinY();
+        int count = 0;
+        for(Coord c : coordMinY){
+            if(!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()-1))){
+                count++;
             }
-            case DEGREE90:{
-                singleRotate180();
-                break;
-            }
-            case DEGREE180:{
-                singleRotate270();
-                break;
-            }
-            case DEGREE270:{
-                singleRotateNormal();
-                break;
-            }
+        }
+        if(count == coordMinY.size()){
+            return true;
+        }
+        return false;
+    }
 
+    private boolean canMoveToRight(){
+        ArrayList<Coord> coordMaxY = this.currentForm.coordWithMaxY();
+        int count = 0;
+        for(Coord c : coordMaxY){
+            if(!this.coordsNotFree.contains(new Coord(c.getX(), c.getY()+1))){
+                count++;
+            }
+        }
+        if(count == coordMaxY.size()){
+            return true;
+        }
+        return false;
+    }
+
+    public void rotate(){
+        if(this.currentForm.getName() != 'O'){
+            arrayCoords[0]=c;
+            removeCurrentForm();
+            switch (this.currentForm.getRotation()){
+                case NORMAL:{
+                    singleRotate90();
+                    break;
+                }
+                case DEGREE90:{
+                    singleRotate180();
+                    break;
+                }
+                case DEGREE180:{
+                    singleRotate270();
+                    break;
+                }
+                case DEGREE270:{
+                    singleRotateNormal();
+                    break;
+                }
+            }
         }
     }
 
@@ -219,23 +255,22 @@ public class Tetris extends Thread {
                 }
             }
             this.forms.add(this.currentForm);
-            //if (currentForm.getName()!='T'){
+            arrayCoords = new Coord[4];
             this.c = this.currentForm.getCoordMin();
-            //}
-
-            //this.coordsNotFree.clear();
             this.checkCoords();
         }
     }
 
+
     private void caseZ() {
-        rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, -1),new Coord(2, -1)};
+        rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 1),new Coord(1, 0),new Coord(2, 0)};
         for (int i=0;i<rotatedCoord.length;i++){
-            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
             if (!free)break;
         }
         return;
     }
+
 
     private void caseS() {
         rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(1, 1),new Coord(2, 1)};
@@ -247,9 +282,9 @@ public class Tetris extends Thread {
     }
 
     private void caseI() {
-        rotatedCoord= new Coord[]{new Coord(1, 0),new Coord(2, 0),new Coord(3, 0)};
+        rotatedCoord= new Coord[]{new Coord(-1, 1),new Coord(0, 1),new Coord(1, 1),new Coord(2, 1)};
         for (int i=0;i<rotatedCoord.length;i++){
-            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
             if (!free)break;
         }
         return;
@@ -295,9 +330,9 @@ public class Tetris extends Thread {
     }
 
     private void caseZ2() {
-        rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(1, 1),new Coord(1, 2)};
+        rotatedCoord= new Coord[]{new Coord(0, -1),new Coord(0, 0),new Coord(1, 0),new Coord(1, 1)};
         for (int i=0;i<rotatedCoord.length;i++){
-            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
             if (!free)break;
         }
         return;
@@ -313,9 +348,9 @@ public class Tetris extends Thread {
     }
 
     private void caseI2() {
-        rotatedCoord= new Coord[]{new Coord(0, 1),new Coord(0, 2),new Coord(0, 3)};
+        rotatedCoord= new Coord[]{new Coord(0, 0),new Coord(0, 1),new Coord(0, 2),new Coord(0, -1)};
         for (int i=0;i<rotatedCoord.length;i++){
-            setSingleRotatedCoord(i+1, rotatedCoord[i].getX(), rotatedCoord[i].getY());
+            setSingleRotatedCoord(i, rotatedCoord[i].getX(), rotatedCoord[i].getY());
             if (!free)break;
         }
         return;
@@ -359,10 +394,6 @@ public class Tetris extends Thread {
         }
         update();
     }
-
-    // La Z e la T sono buggate come gesu
-    //Controllare se le coordinate escono fuori dalla griglia
-    //metodo esplosione riga
 
     public void singleRotate270(){
         switch (this.currentForm.getName()){
@@ -442,22 +473,78 @@ public class Tetris extends Thread {
         update();
     }
 
-    public boolean checkLose(){
-        Coord[] coords = this.currentForm.getCoords();
-        if(this.coordsNotFree.contains(coords[0])
-                || this.coordsNotFree.contains(coords[1])
-                || this.coordsNotFree.contains(coords[2])
-                || this.coordsNotFree.contains(coords[3])){
-            this.lose = true;
-            return true;
+    public boolean getLose(){
+        return this.lose;
+    }
+
+    public void explosion(){
+        ArrayList<Integer> formsIndex = new ArrayList<>();
+        ArrayList<Coord> coordsToRemove = new ArrayList<>();
+        int count = 0;
+        for(int i = 0; i < this.row; i++){
+            for(int j = 0; j < this.col; j++){
+                for(Form f : this.forms){
+                    if(f.compare(new Coord(i, j))){
+                        count++;
+                        formsIndex.add(this.forms.indexOf(f));
+                        coordsToRemove.add(new Coord(i, j));
+                    }
+                }
+            }
+            if(count == this.col){
+                this.removeCoord(formsIndex, coordsToRemove);
+                this.points += 10*formsIndex.size();
+                this.dropAll();
+            }
+            count = 0;
+            formsIndex.clear();
+            coordsToRemove.clear();
+
         }
-        return false;
+        this.coordsNotFree.clear();
+        this.checkCoords();
+    }
+
+    private void removeCoord(ArrayList<Integer> formsIndex, ArrayList<Coord> coordsToRemove){
+        for(int i = 0; i < formsIndex.size(); i++){
+            Coord[] coords = this.forms.get(formsIndex.get(i)).getCoords();
+            for(int j = 0; j < coords.length; j++){
+                if (coordsToRemove.contains(coords[j])){
+                    coords[j].setX(-1);
+                    coords[j].setY(-1);
+                }
+            }
+            this.forms.get(formsIndex.get(i)).setCoords(coords);
+        }
+    }
+
+    private void dropAll(){
+        for(Form f : this.forms){
+            Coord[] coords = f.getCoords();
+            for(int i = 0; i < coords.length; i++){
+                if(coords[i].getX() != -1  && coords[i].getX() != this.row-1){
+                    coords[i].setX(coords[i].getX()+1);
+                }
+            }
+            f.setCoords(coords);
+        }
+        this.coordsNotFree.clear();
+        this.checkCoords();
     }
 
     public String toString(){
         String result = "";
         boolean found = false;
         result += "╔══════════════════════════════╗\n";
+        result += "║         Score:";
+        if(this.points < 10){
+            result += "    " + this.points;
+        }else if(this.points < 100){
+            result += "   " + this.points;
+        }else{
+            result += "  " + this.points;
+        }
+        result += "          ║\n";
         result += "╠══════════════════════════════╣\n";
         for(int i = 0; i < this.row; i++){
             result += "║";

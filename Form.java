@@ -7,7 +7,7 @@ public class Form {
     private char name;
     Coord[] coords = new Coord[4];
     String color;
-    int xMax;
+    int xMax, yMin, yMax;
     private Rotation rotation = Rotation.NORMAL;
 
 
@@ -40,7 +40,7 @@ public class Form {
     }
 
     public int getMaxY(){
-        int yMax = this.coords[0].getY();
+        this.yMax = this.coords[0].getY();
         for(int i = 1; i < this.coords.length; i++){
             if(this.coords[i].getY() > yMax){
                 yMax = this.coords[i].getY();
@@ -49,8 +49,9 @@ public class Form {
         return yMax;
     }
 
+    //Una volta che la variabile è dichiarata a livello di classe il metodo va fatto void, e la variabile va restituita con un get
     public int getMinY(){
-        int yMin = this.coords[0].getY();
+        this.yMin = this.coords[0].getY();
         for(int i = 1; i < this.coords.length; i++){
             if(this.coords[i].getY() < yMin){
                 yMin = this.coords[i].getY();
@@ -70,6 +71,7 @@ public class Form {
         return coordMin;
     }
 
+    //Eliminare
     public ArrayList<Integer> getArrY(){
         ArrayList<Integer> arrY = new ArrayList<>();
         for (int i = 0; i < this.coords.length; i++){
@@ -94,6 +96,26 @@ public class Form {
             }
         }
         return coordsDiffY;
+    }
+
+    public ArrayList<Coord> coordWithMinY(){
+        ArrayList<Coord> arrXWithMinY = new ArrayList<>();
+        for(Coord c : this.coords){
+            if(c.getY() == this.yMin){
+                arrXWithMinY.add(c);
+            }
+        }
+        return arrXWithMinY;
+    }
+
+    public ArrayList<Coord> coordWithMaxY(){
+        ArrayList<Coord> arrXWithMaxY = new ArrayList<>();
+        for(Coord c : this.coords){
+            if(c.getY() == this.yMax){
+                arrXWithMaxY.add(c);
+            }
+        }
+        return arrXWithMaxY;
     }
 
     public Coord[] getCoords(){
