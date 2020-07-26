@@ -1,3 +1,5 @@
+package Tetris;
+
 import java.util.ArrayList;
 
 public class Form {
@@ -76,6 +78,22 @@ public class Form {
             }
         }
         return arrY;
+    }
+
+    public ArrayList<Coord> coordWithDifferentY(){
+        ArrayList<Coord> coordsDiffY = new ArrayList<>();
+        ArrayList<Coord> currentCoords = new ArrayList<>();
+        currentCoords.add(this.coords[0]);
+        currentCoords.add(this.coords[1]);
+        currentCoords.add(this.coords[2]);
+        currentCoords.add(this.coords[3]);
+
+        for(Coord c : currentCoords){
+            if(!currentCoords.contains(new Coord(c.getX()+1, c.getY()))){
+                coordsDiffY.add(c);
+            }
+        }
+        return coordsDiffY;
     }
 
     public Coord[] getCoords(){

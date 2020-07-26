@@ -1,3 +1,5 @@
+package Tetris;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -47,43 +49,43 @@ public class Tetris extends Thread {
         this.checkCoords();
     }
 
+    //FUNZIONA
     public void gravity(){
         if(nextRowFree()){
             this.coordsNotFree.clear();
             this.currentForm.drop();
             this.checkCoords();
             this.c = this.currentForm.getCoordMin();
+        }else{
+           this.formGenerator();
         }
     }
 
+    //FUNZIONA
     public boolean nextRowFree(){
-        Coord c;
+        ArrayList<Coord> coordsDiffY = this.currentForm.coordWithDifferentY();
         boolean free = false;
         int count = 0;
         int xMax = this.currentForm.getMaxX();
-        ArrayList<Integer> arrY = this.currentForm.getArrY();
-        if(xMax < this.row-1){
-            for(Integer i : arrY){
-                c = new Coord(xMax+1, i);
-                if(this.coordsNotFree.contains(c)){
-                    break;
-                }else{
-                    count++;
-                }
-
+        for(Coord c : coordsDiffY){
+            if(this.coordsNotFree.contains(new Coord(c.getX()+1, c.getY())) || xMax+1 >= this.row){
+                break;
+            }else{
+                count++;
             }
         }
-        if(count == arrY.size()){
+        if(count == coordsDiffY.size()){
             free = true;
         }
         return free;
     }
 
+    //FUNZIONA
     public void checkCoords(){
         for(int i = 0; i < this.row; i++){
             for(int j = 0; j < this.col; j++){
                 for(Form f : this.forms){
-                    if(f.compare(new Coord(i,j))){
+                    if(f.compare(new Coord(i,j)) && !this.coordsNotFree.contains(new Coord(i,j))){
                         this.coordsNotFree.add(new Coord(i,j));
                     }
                 }
@@ -91,6 +93,7 @@ public class Tetris extends Thread {
         }
     }
 
+    //FUNZIONA
     public void formGenerator(){
         int numb = ThreadLocalRandom.current().nextInt(7);
         System.out.println(numb);
@@ -127,6 +130,7 @@ public class Tetris extends Thread {
         this.currentForm = this.forms.getLast();
     }
 
+    //FUNZIONA
     public void move(Move m){
         Coord [] coords = this.currentForm.getCoords();
         int maxY = this.currentForm.getMaxY();
@@ -146,12 +150,12 @@ public class Tetris extends Thread {
         }
         this.forms.remove(this.currentForm);
         this.currentForm.setCoords(coords);
-        this.c = this.currentForm.getCoordMin();
         this.forms.add(this.currentForm);
+        this.c = this.currentForm.getCoordMin();
+
     }
 
     public void rotate(){
-        Coord [] coords = this.currentForm.getCoords();
         arrayCoords[0]=c;
         removeCurrentForm();
         switch (this.currentForm.getRotation()){
@@ -213,13 +217,13 @@ public class Tetris extends Thread {
                     this.currentForm.setRotation(Form.Rotation.NORMAL);
                     break;
                 }
-
             }
-            //if (currentForm.getName()!='T'){
-                this.c = this.currentForm.getCoordMin();
-            //}
             this.forms.add(this.currentForm);
-            this.coordsNotFree.clear();
+            //if (currentForm.getName()!='T'){
+            this.c = this.currentForm.getCoordMin();
+            //}
+
+            //this.coordsNotFree.clear();
             this.checkCoords();
         }
     }
