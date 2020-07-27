@@ -25,7 +25,7 @@ public class Tetris extends Thread {
                 if(this.points > 500){
                     sleep(500);
                 }else{
-                    sleep(700);
+                    sleep(1000);
                 }
                 this.gravity();
                 System.out.println(this.toString());
@@ -494,7 +494,7 @@ public class Tetris extends Thread {
             if(count == this.col){
                 this.removeCoord(formsIndex, coordsToRemove);
                 this.points += 10*formsIndex.size();
-                this.dropAll();
+                this.dropAll(i);
             }
             count = 0;
             formsIndex.clear();
@@ -518,11 +518,11 @@ public class Tetris extends Thread {
         }
     }
 
-    private void dropAll(){
+    private void dropAll(int deletedRow){
         for(Form f : this.forms){
             Coord[] coords = f.getCoords();
             for(int i = 0; i < coords.length; i++){
-                if(coords[i].getX() != -1  && coords[i].getX() != this.row-1){
+                if(coords[i].getX() != -1  && coords[i].getX() < deletedRow){
                     coords[i].setX(coords[i].getX()+1);
                 }
             }
